@@ -1001,6 +1001,23 @@ public class Solution {
         }
     }
 
+    /**
+     * 452 132 pattern
+     */
+    public boolean find132pattern(int[] nums) {
+        if (nums == null || nums.length < 3) return false;
+        int third = Integer.MIN_VALUE,len = nums.length;
+        Stack<Integer> stack = new Stack<>();
+        for (int i = len-1;i>=0;i--) {
+            if (nums[i] < third) return true;
+            while (!stack.isEmpty() && stack.peek() < nums[i]) {
+                third = stack.pop();
+            }
+            stack.push(nums[i]);
+        }
+        return false;
+    }
+
     public static void main(String[] args){
         Solution solution = new Solution();
     }

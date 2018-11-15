@@ -655,266 +655,30 @@ public class Solution {
     }
 
     /**
-     * 785 is graph bipartite
-     * dfs
-     * @param graph graph
-     * @return true if and only if it is bipartite
+     * 777 Swap Adjacent in LR String
      */
-    public boolean isBipartite(int[][] graph) {
-        int len = graph.length;
-        int[] color = new int[len];
-        for (int i = 0;i<len;i++){
-            if(color[i] == 0){
-                if(!isBipartiteDfs(graph,color,1,i)) return false;
-            }
+    public boolean canTransform(String start, String end) {
+        int len = start.length(),i = 0,j = 0;
+        while (i < len && j < len) {
+            while (i < len && start.charAt(i) == 'X') i++;
+            while (j < len && end.charAt(j) == 'X') j++;
+            if (i == len && j == len)
+                return true;
+            else if (i == len || j == len)
+                return false;
+            if (start.charAt(i) != end.charAt(j)) return false;
+            if ((start.charAt(i) == 'L' && i < j) || (start.charAt(i) == 'R' && j < i)) return false;
+            i++;
+            j++;
         }
         return true;
-     }
-     private boolean isBipartiteDfs(int[][] graph,int[] color,int c,int index){
-        color[index] = c;
-        for (int i = 0;i<graph[index].length;i++){
-            if(color[graph[index][i]] == c) return false;
-            if(color[graph[index][i]] == 0 && !isBipartiteDfs(graph,color,-c,graph[index][i])) return false;
-        }
-        return true;
-     }
+    }
 
     public static void main(String[] args){
         Solution solution = new Solution();
         ListNode listNode = new ListNode(0);ListNode listNode1 = new ListNode(2);ListNode listNode2 = new ListNode(3);
         ListNode listNode3 = new ListNode(4);
 //        listNode.next = listNode1;listNode1.next = listNode2;listNode2.next = listNode3;
-        solution.isBipartite(new int[][]{{1,2,3}, {0,2}, {0,1,3}, {0,2}});
-    }
-}
-
-/**
- * 703 kth longest element in a stream
- */
-class KthLargest {
-
-    final PriorityQueue<Integer> q;
-    final int k;
-
-    public KthLargest(int k, int[] a) {
-        this.k = k;
-        q = new PriorityQueue<>(k);
-        for (int n : a)
-            add(n);
-    }
-
-    public int add(int n) {
-        if (q.size() < k)
-            q.offer(n);
-        else if (q.peek() < n) {
-            q.poll();
-            q.offer(n);
-        }
-        return q.peek();
-    }
-
-}
-
-/**
- * 705 design hashset
- */
-class MyHashSet {
-
-    private int buckets = 1000;
-    private int itemsPerBucket = 1001;
-    private boolean[][] table;
-
-    /** Initialize your data structure here. */
-    public MyHashSet() {
-        table = new boolean[buckets][];
-    }
-
-    public int hash(int key) {
-        return key % buckets;
-    }
-
-    public int pos(int key) {
-        return key / buckets;
-    }
-
-    public void add(int key) {
-        int hashkey = hash(key);
-
-        if (table[hashkey] == null) {
-            table[hashkey] = new boolean[itemsPerBucket];
-        }
-        table[hashkey][pos(key)] = true;
-    }
-
-    public void remove(int key) {
-        int hashkey = hash(key);
-
-        if (table[hashkey] != null)
-            table[hashkey][pos(key)] = false;
-    }
-
-    /** Returns true if this set did not already contain the specified element */
-    public boolean contains(int key) {
-        int hashkey = hash(key);
-        return table[hashkey] != null && table[hashkey][pos(key)];
-    }
-}
-
-/**
- * 705 design linkedList
- */
-class MyLinkedList {
-
-    private Node head;
-    private Node last;
-    private int size;
-
-    /** Initialize your data structure here. */
-    public MyLinkedList() {
-        head = null;
-        last = head;
-        size = 0;
-    }
-
-    /** Get the value of the index-th node in the linked list. If the index is invalid, return -1. */
-    public int get(int index) {
-        if(size<=index) return -1;
-        Node node = head;
-        while (index > 0){
-            node = node.next;
-            index--;
-        }
-        return node.val;
-    }
-
-    /** Add a node of value val before the first element of the linked list. After the insertion, the new node will be the first node of the linked list. */
-    public void addAtHead(int val) {
-        Node node = new Node();
-        node.val = val;
-        if(size == 0){
-            head = node;
-            last = node;
-        }else {
-            node.next = head;
-            head.pre = node;
-            head = node;
-        }
-        size++;
-    }
-
-    /** Append a node of value val to the last element of the linked list. */
-    public void addAtTail(int val) {
-        Node node = new Node();
-        node.val = val;
-        if(size == 0){
-            head = node;
-            last = node;
-        }else {
-            last.next = node;
-            node.pre = last;
-            last = node;
-        }
-        size++;
-    }
-
-    /** Add a node of value val before the index-th node in the linked list. If index equals to the length of linked list, the node will be appended to the end of linked list. If index is greater than the length, the node will not be inserted. */
-    public void addAtIndex(int index, int val) {
-        if(index>size)
-            return;
-        if(index == size){
-            addAtTail(val);
-        }else if(index == 0)
-            addAtHead(val);
-        else {
-            Node node = new Node();
-            node.val = val;
-            Node temp = head;
-            for(int i = 0;i<index;i++){
-                temp = temp.next;
-            }
-            node.pre = temp.pre;
-            node.next = temp;
-            temp.pre.next = node;
-            temp.pre = node;
-            size++;
-        }
-
-    }
-
-    /** Delete the index-th node in the linked list, if the index is valid. */
-    public void deleteAtIndex(int index) {
-        if(index<0 || index>= size)
-            return;
-        if(index == 0){
-            Node temp = head;
-            head = head.next;
-            head.pre = null;
-            temp = null;
-        }else if(index == size-1){
-            Node temp = last;
-            last = last.pre;
-            last.next = null;
-            temp = null;
-        }else {
-            Node temp = head;
-            for (int i = 0;i<index;i++){
-                temp = temp.next;
-            }
-            temp.pre.next = temp.next;
-            temp.next.pre = temp.pre;
-        }
-        size--;
-    }
-
-    class Node{
-        int val;
-        Node next;
-        Node pre;
-    }
-}
-
-/**
- * 729 my calendar I
- * binary search tree
- */
-class MyCalendar {
-
-    class Node{
-        int start,end;
-        Node left,right;
-        public Node(int start,int end){
-            this.start = start;
-            this.end = end;
-        }
-    }
-
-    Node root = null;
-
-    public MyCalendar() {
-
-    }
-
-    public boolean book(int start, int end) {
-        if(root == null) root = new Node(start,end);
-        else {
-            Node node = root;
-            Node pre = null;
-            boolean mask = false;
-            while (node != null){
-                pre = node;
-                if(start >= node.end){
-                    mask = false;
-                    node = node.right;
-                }else if(end <= node.start){
-                    mask = true;
-                    node = node.left;
-                }else
-                    return false;
-            }
-            Node temp = new Node(start,end);
-            if(mask) pre.left = temp;
-            else pre.right = temp;
-        }
-        return true;
+        solution.canTransform("XLXRRXXRXX", "LXXXXXXRRR");
     }
 }

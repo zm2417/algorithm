@@ -1,6 +1,8 @@
 package leetcode300_400;
 
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import leetcode0_100.ListNode;
+import sun.nio.cs.ext.MacArabic;
 
 import java.util.*;
 
@@ -639,151 +641,181 @@ public class Solution {
         return false;
     }
 
-    public static void main(String[] args){
-        Solution solution = new Solution();
-        solution.increasingTriplet(new int[]{9,10,1,11});
-    }
-}
-
-/**
- * 384 shuffle an array
- */
-class Solution2 {
-
-    private int[] array;
-    private int[] original;
-
-    Random rand = new Random();
-
-    private int randRange(int min, int max) {
-        return rand.nextInt(max - min) + min;
-    }
-
-    private void swapAt(int i, int j) {
-        int temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-    }
-
-    public Solution2(int[] nums) {
-        array = nums;
-        original = nums.clone();
-    }
-
-    public int[] reset() {
-        array = original;
-        original = original.clone();
-        return original;
-    }
-
-    public int[] shuffle() {
-        for (int i = 0; i < array.length; i++) {
-            swapAt(i, randRange(i, array.length));
+    /**
+     * 310 minimum height trees
+     */
+    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
+        // 剥洋葱算法
+        if (n == 1) return Collections.singletonList(0);
+        List<Integer> leaves = new ArrayList<>();
+        List<Set<Integer>> grid = new ArrayList<>();
+        for (int i = 0;i<n;i++){
+            grid.add(new HashSet<>());
         }
-        return array;
+        for (int[] arr : edges){
+            grid.get(arr[0]).add(arr[1]);
+            grid.get(arr[1]).add(arr[0]);
+        }
+        for (int i = 0;i<n;i++){
+            if (grid.get(i).size() == 1) leaves.add(i);
+        }
+        while (n > 2){
+            n -= leaves.size();
+            List<Integer> newLeaves = new ArrayList<>();
+            for (int i : leaves){
+                int t = grid.get(i).iterator().next();
+                grid.get(t).remove(i);
+                if (grid.get(t).size() == 1) newLeaves.add(t);
+            }
+            leaves = newLeaves;
+        }
+        return leaves;
     }
-}
 
-/**
- * 398 random pick index
- */
-class Solution3 {
-
-    private Random rand;
-    private int[] nums;
-
-    public Solution3(int[] nums) {
-        this.nums = nums;
-        rand = new Random();
-    }
-
-    public int pick(int target) {
-        int count = 0;
-        int res = -1;
-
-        for(int i = 0; i < nums.length; i++) {
-            if(nums[i] != target) {
-                continue;
-            } else {
-                if(rand.nextInt(++count) == 0) {
-                    res = i;
+    /**
+     * 304 Range Sum Query 2D - Immutable
+     */
+    class NumMatrix {
+        private int[][] dp;
+        public NumMatrix(int[][] matrix) {
+            if (matrix.length == 0 || matrix[0].length == 0) return;
+            dp = new int[matrix.length + 1][matrix[0].length + 1];
+            for (int r = 0; r < matrix.length; r++) {
+                for (int c = 0; c < matrix[0].length; c++) {
+                    dp[r + 1][c + 1] = dp[r + 1][c] + dp[r][c + 1] + matrix[r][c] - dp[r][c];
                 }
             }
         }
-
-        return res;
-    }
-}
-
-/**
- * 341 flatten nested list iterator
- */
-class NestedIterator implements Iterator<Integer> {
-
-    List<Integer> list = new ArrayList<>();
-    int mask = 0;
-    public NestedIterator(List<NestedInteger> nestedList) {
-        helper(nestedList);
+        public int sumRegion(int row1, int col1, int row2, int col2) {
+            return dp[row2 + 1][col2 + 1] - dp[row1][col2 + 1] - dp[row2 + 1][col1] + dp[row1][col1];
+        }
     }
 
-    public void helper(List<NestedInteger> nestedList){
-        for (NestedInteger nestedInteger : nestedList){
-            if(nestedInteger.isInteger()){
-                list.add(nestedInteger.getInteger());
+    /**
+     * 332 Reconstruct Itinerary
+     */
+    List<String> findItinerary = new ArrayList<>();
+    public List<String> findItinerary(String[][] tickets) {
+        List<String> list = new ArrayList<>();
+        int[] used = new int[tickets.length];
+        Arrays.sort(tickets, new Comparator<String[]>() {
+            @Override
+            public int compare(String[] o1, String[] o2) {
+                return o1[1].compareTo(o2[1]);
+            }
+        });
+        Map<String,List<Integer>> map = new HashMap<>();
+        for (int i = 0;i<tickets.length;i++){
+            if (map.containsKey(tickets[i][0])) {
+                map.get(tickets[i][0]).add(i);
             }else {
-                helper(nestedInteger.getList());
+                List<Integer> t = new ArrayList<>();
+                t.add(i);
+                map.put(tickets[i][0],t);
+            }
+        }
+        list.add("JFK");
+        findItinerary(map,tickets,used,list,"JFK");
+        return findItinerary;
+    }
+    private void findItinerary(Map<String,List<Integer>> map,String[][] tickets, int[] used, List<String> list, String str) {
+        if (tickets.length+1 == list.size()) {
+            findItinerary = new ArrayList<>(list);
+            return;
+        }
+        if (!map.containsKey(str))
+            return;
+        for (int i : map.get(str)) {
+            if (used[i] == 0) {
+                used[i] = 1;
+                list.add(tickets[i][1]);
+                findItinerary(map,tickets,used,list,tickets[i][1]);
+                if (tickets.length+1 == list.size())
+                    return;
+                used[i] = 0;
+                list.remove(list.size()-1);
             }
         }
     }
 
-    @Override
-    public Integer next() {
-        return list.get(mask++);
+    /**
+     * 306 additive number
+     */
+    public boolean isAdditiveNumber(String num) {
+        if (num == null || num.length() < 3) return false;
+        if (num.charAt(0) == '0'){
+            if (num.charAt(1) == '0'){
+                for (int i = 2;i<num.length();i++) {
+                    if (num.charAt(i) != '0'){
+                        return false;
+                    }
+                }
+                return true;
+            }
+            for (int i = 1;i<num.length();i++){
+                String a = num.substring(1,i+1);
+                if (isAdditiveNumber(num,"0",a,i+1,2)) {
+                    return true;
+                }
+            }
+        }else {
+            for (int i = 0;i<num.length();i++) {
+                for (int j = i+1;j<num.length();j++) {
+                    if (num.charAt(i+1) == '0' && j - i > 1){
+                        break;
+                    }
+                    String a = num.substring(0,i+1);
+                    String b = num.substring(i+1,j+1);
+                    if (isAdditiveNumber(num,a,b,j+1,2)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
-
-    @Override
-    public boolean hasNext() {
-        return mask < list.size();
-    }
-}
-
-/**
- * 380 insert delete getRandom O(1)
- */
-class RandomizedSet {
-
-    private List<Integer> list = new ArrayList<>();
-    private Map<Integer,Integer> map = new HashMap<>();
-
-    /** Initialize your data structure here. */
-    public RandomizedSet() {
-
-    }
-
-    /** Inserts a value to the set. Returns true if the set did not already contain the specified element. */
-    public boolean insert(int val) {
-        if(map.containsKey(val))
+    private boolean isAdditiveNumber(String num,String num1,String num2,int index,int count) {
+        if (index == num.length())
+            return count >= 3;
+        if (num.charAt(index) == '0')
             return false;
-        list.add(val);
-        map.put(val,list.size()-1);
-        return true;
-    }
-
-    /** Removes a value from the set. Returns true if the set contained the specified element. */
-    public boolean remove(int val) {
-        if(!map.containsKey(val))
+        String target = add(num1,num2);
+        if (index + target.length() <= num.length() && num.substring(index,index+target.length()).equals(target)) {
+            return isAdditiveNumber(num,num2,target,index+target.length(),count+1);
+        }else {
             return false;
-        int index = map.get(val);
-        list.set(index,list.get(list.size()-1));
-        map.put(list.get(list.size()-1),index);
-        map.remove(val);
-        list.remove(list.size()-1);
-        return true;
+        }
+    }
+    private String add(String num1,String num2) {
+        int i = num1.length()-1,j = num2.length()-1,pre = 0;
+        StringBuilder stringBuilder = new StringBuilder();
+        while (i>=0 || j>=0){
+            int temp = pre;
+            if (i >= 0) {
+                temp += num1.charAt(i)-'0';
+                i--;
+            }
+            if (j >= 0) {
+                temp += num2.charAt(j)-'0';
+                j--;
+            }
+            if (temp > 9){
+                pre = temp / 10;
+                stringBuilder.append(temp % 10);
+            }else {
+                stringBuilder.append(temp);
+                pre = 0;
+            }
+        }
+        if (pre != 0){
+            stringBuilder.append(pre);
+        }
+        return stringBuilder.reverse().toString();
     }
 
-    /** Get a random element from the set. */
-    public int getRandom() {
-        Random random = new Random();
-        return list.get(random.nextInt(list.size()));
+    public static void main(String[] args){
+        Solution solution = new Solution();
+        solution.isAdditiveNumber("101");
     }
+
 }

@@ -593,14 +593,6 @@ public class Solution {
         return false;
     }
 
-    /**
-     * 289 game of life
-     * @param board matrix
-     */
-    public void gameOfLife(int[][] board) {
-
-    }
-
     public static void main(String[] args){
         Solution solution = new Solution();
         solution.findKthLargest(new int[]{3,2,1,5,6,4},2);

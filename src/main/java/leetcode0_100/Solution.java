@@ -878,8 +878,101 @@ public class Solution {
         }
     }
 
+    /**
+     * 79 Word Search
+     */
+    public boolean exist(char[][] board, String word) {
+        if (word == null || word.length() == 0)
+            return true;
+        char[] temp = word.toCharArray();
+        for (int i = 0;i<board.length;i++){
+            for (int j = 0;j<board[i].length;j++){
+                if (exist(board,temp,0,i,j))
+                    return true;
+            }
+        }
+        return false;
+    }
+    private boolean exist(char[][] board,char[] temp,int index,int i,int j){
+         if (index == temp.length) return true;
+         if (i < 0 || i >= board.length || j < 0 || j >= board[i].length || temp[index] != board[i][j]) return false;
+         board[i][j] = '#';
+         boolean res = exist(board,temp,index+1,i,j+1) || exist(board,temp,index+1,i,j-1) ||
+                 exist(board,temp,index+1,i+1,j) || exist(board,temp,index+1,i-1,j);
+         board[i][j] = temp[index];
+         return res;
+    }
+
+    /**
+     * 54 spiral order
+     */
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> list = new ArrayList<>();
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0)
+            return list;
+        int m = matrix.length,n = matrix[0].length;
+        int t = m % 2 == 1 ? 1+m/2 : m/2;
+        int x = n % 2 == 1 ? 1+n/2 : n/2;
+        for (int k = 0;k<Math.min(t,x);k++){
+            for (int i = k;i<n-k;i++){
+                list.add(matrix[k][i]);
+            }
+            if (n-1-k >= k){
+                for (int i = k+1;i<m-k;i++){
+                    list.add(matrix[i][n-1-k]);
+                }
+            }
+            if (m-1-k != k){
+                for (int i = n-2-k;i>=k;i--){
+                    list.add(matrix[m-1-k][i]);
+                }
+            }
+            if (k != n-1-k){
+                for (int i = m-2-k;i>k;i--){
+                    list.add(matrix[i][k]);
+                }
+            }
+
+        }
+        return list;
+    }
+
+    /**
+     * 31 next permutation
+     */
+    public void nextPermutation(int[] nums) {
+        if (nums == null || nums.length == 0)
+            return;
+        int len = nums.length;
+        int val = nums[len-1],index = -1;
+        for (int i = len-2;i>=0;i--) {
+            if (nums[i] < val){
+                int t = Integer.MAX_VALUE,p = -1;
+                for (int j = len-1;j>i;j--){
+                     if (nums[j] > nums[i]){
+                        if (t > nums[j]) {
+                            t = nums[j];
+                            p = j;
+                        }
+                     }
+                }
+                nums[p] = nums[i];
+                nums[i] = t;
+                index = i + 1;
+                break;
+            }else if (nums[i] > val) {
+                val = nums[i];
+            }
+        }
+        if (index != -1) {
+            Arrays.sort(nums,index,len);
+        }else {
+            Arrays.sort(nums);
+        }
+    }
+
     public static void main(String[] args){
         Solution solution = new Solution();
-        solution.subsetsWithDup(new int[]{4,4,4,1,4});
+        solution.nextPermutation(new int[]{2,3,1});
     }
 }

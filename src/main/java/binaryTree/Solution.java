@@ -1317,6 +1317,29 @@ public class Solution {
     }
 
     /**
+     * 222 count complete binary trees
+     */
+    public int countNodes(TreeNode root) {
+        if (root == null)
+            return 0;
+        int l = 1,r = 1;
+        TreeNode left = root.left,right = root.right;
+        while (left != null) {
+            l++;
+            left = left.left;
+        }
+        while (right != null) {
+            r++;
+            right = right.left;
+        }
+        if (l == r) {
+            return (1 << l) + countNodes(root.right);
+        }else {
+            return (1 << l) + countNodes(root.left);
+        }
+    }
+
+    /**
      *      5
      *     / \
      *    2   -5
@@ -1332,69 +1355,5 @@ public class Solution {
         treeNode1.left = treeNode2;treeNode1.right = treeNode3;
         treeNode2.right = treeNode4;treeNode3.right = treeNode5;
         solution.distanceK(treeNode1,treeNode3,2);
-    }
-}
-
-/**
- * 173 binary search tree iterator
- */
-class BSTIterator {
-
-    Stack<TreeNode> stack = new Stack<>();
-
-    public BSTIterator(TreeNode root) {
-        while (root != null){
-            stack.push(root);
-            root = root.left;
-        }
-    }
-
-    /** @return whether we have a next smallest number */
-    public boolean hasNext() {
-        return !stack.isEmpty();
-    }
-
-    /** @return the next smallest number */
-    public int next() {
-        TreeNode treeNode = stack.pop();
-        TreeNode cur = treeNode.right;
-        while (cur != null){
-            stack.push(cur);
-            cur = cur.left;
-        }
-        return treeNode.val;
-    }
-}
-
-/**
- * 449 serialize and deserialize BST
- */
-class Codec {
-
-    // Encodes a tree to a single string.
-    public String serialize(TreeNode root) {
-        if(root == null) return "$,";
-        return root.val+","+serialize(root.left)+serialize(root.right);
-    }
-
-    // Decodes your encoded data to tree.
-    public TreeNode deserialize(String data) {
-        Queue<String> queue = new LinkedList<>();
-        String[] datas = data.split(",");
-        for (String s : datas){
-            queue.add(s);
-        }
-        return dfs(queue);
-    }
-
-    private TreeNode dfs(Queue<String> queue){
-        String s = queue.remove();
-        if(s.equals("$")){
-            return null;
-        }
-        TreeNode node = new TreeNode(Integer.parseInt(s));
-        node.left = dfs(queue);
-        node.right = dfs(queue);
-        return node;
     }
 }

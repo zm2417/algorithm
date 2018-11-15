@@ -464,6 +464,31 @@ public class Solution {
         return l;
     }
 
+    /**
+     * 142 linked list cycle
+     */
+    public ListNode detectCycle(ListNode head) {
+        if (head == null)
+            return null;
+        ListNode slow = head,fast = head;
+        while (true) {
+            if (fast.next == null || fast.next.next == null)
+                return null;
+            slow = slow.next;
+            fast = fast.next.next;
+            if (slow == fast)
+                break;
+        }
+        slow = head;
+        while (true) {
+            if (slow == fast) {
+                return slow;
+            }
+            slow = slow.next;
+            fast = fast.next;
+        }
+    }
+
     public static void main(String[] args){
         Solution solution = new Solution();
         solution.findMin(new int[]{2,1});
